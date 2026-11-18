@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UANGKU - Aplikasi Keuangan</title>
+  <style>
+    :root {
+      --blue: #118eea;
+      --blue-light: #eaf6ff;
+      --ink: #17212b;
+      --muted: #6c7783;
+      --surface: #ffffff;
+      --background: #f4f7fa;
+      --border: #e5edf4;
+      --success: #20b26b;
+      --danger: #ef4b4b;
+    }
+    body.dark-theme {
+      --ink: #e8eef5;
+      --muted: #a4b0bc;
+      --surface: #1c2732;
+      --background: #111a23;
+      --border: #34414d;
+      --blue-light: #183b55;
+      background: #0b1219;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: #dde9f3;
+    }
+    button, input, select { font: inherit; }
+    .phone {
+      width: min(100%, 430px);
+      min-height: 100vh;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--background);
+      box-shadow: 0 0 40px rgba(35, 85, 125, 0.18);
+    }
+    .header {
+      min-height: 160px;
+      padding: 20px;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), #36a9ee);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.14);
+    }
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 0;
+      padding: 0;
+      color: var(--blue);
+      background: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .avatar:focus-visible {
+      outline: 3px solid white;
+      outline-offset: 3px;
+    }
+    .profile-name { font-size: 13px; opacity: 0.9; }
+    .balance-card {
+      position: relative;
+      z-index: 2;
+      min-height: 112px;
+      margin: -42px 16px 14px;
+      padding: 18px;
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(30, 75, 115, 0.12);
+    }
+    .balance-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .balance {
+      margin-top: 7px;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 0 16px 16px;
+    }
+    .action-btn {
+      border: 0;
+      color: var(--ink);
+      background: transparent;
+      cursor: pointer;
+    }
+    .action-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 7px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: var(--blue);
+      background: var(--blue-light);
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .action-btn span:last-child {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .section {
+      margin: 0 16px 16px;
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title { font-weight: 800; }
+    .text-btn {
+      border: 0;
+      color: var(--blue);
+      background: none;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .transaction {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .transaction:last-child { border-bottom: 0; }
+    .transaction-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--blue-light);
+      color: var(--blue);
+      font-weight: 800;
+    }
+    .transaction-title {
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .transaction-date {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .transaction-amount {
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .income { color: var(--success); }
+    .expense { color: var(--danger); }
+    .bottom-nav {
+      position: sticky;
+      bottom: 0;
+      height: 68px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      border-top: 1px solid var(--border);
+      background: white;
+    }
+    .nav-btn {
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .nav-btn.active { color: var(--blue); }
+    .nav-icon {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(14, 31, 45, 0.48);
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: min(100%, 430px);
+      padding: 20px;
+      border-radius: 22px 22px 0 0;
+      background: white;
+      animation: slideUp 0.18s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal h2 {
+      margin: 0 0 16px;
+      font-size: 18px;
+    }
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .field input, .field select {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: white;
+      outline: none;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-light);
+    }
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .modal-actions button {
+      height: 46px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .cancel-btn {
+      border: 1px solid var(--border);
+      background: white;
+    }
+    .submit-btn {
+      border: 0;
+      color: white;
+      background: var(--blue);
+    }
+    .empty-state {
+      padding: 18px 0 4px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+    .page { display: none; }
+    .page.active { display: block; }
+    .settings-card {
+      margin: 0 16px 16px;
+      padding: 18px;
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: 0; }
+    .settings-description {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .settings-input {
+      width: 100%;
+      height: 48px;
+      margin-top: 10px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--ink);
+      background: var(--surface);
+    }
+    .primary-btn {
+      width: 100%;
+      height: 46px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 10px;
+      color: white;
+      background: var(--blue);
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .dark-theme .bottom-nav { background: var(--surface); }
+    .dark-theme .modal { background: var(--surface); }
+    .dark-theme .field input, .dark-theme .field select,
+    .dark-theme .cancel-btn {
+      color: var(--ink);
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .dark-theme .income-summary { background: #19382d !important; }
+    .dark-theme .expense-summary { background: #3a2427 !important; }
+    @media (min-width: 431px) {
+      body { padding: 20px 0; }
+      .phone { min-height: calc(100vh - 40px); border-radius: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <header class="header">
+      <div class="topbar">
+        <div class="profile">
+          <button id="profile-avatar" class="avatar" type="button" aria-label="Buka menu pengaturan" aria-controls="menu-page" aria-expanded="false">A</button>
+          <div id="profile-name" class="profile-name">Halo, Andi</div>
+        </div>
+      </div>
+    </header>
+
+    <div id="home-page" class="page active">
+      <section class="balance-card">
+        <div class="balance-label">
+          <span>Saldo Saya</span>
+        </div>
+        <div id="balance" class="balance">Rp 0</div>
+      </section>
+    </div>
+
+    <section id="menu-page" class="page">
+      <div class="settings-card">
+        <div class="section-title">Pengaturan Aplikasi</div>
+        <form id="profile-form" class="settings-row">
+          <div style="flex:1">
+            <label for="profile-name-input" class="section-title">Nama profil</label>
+            <div class="settings-description">Nama ini ditampilkan di sapaan dan inisial avatar.</div>
+            <input id="profile-name-input" class="settings-input" type="text" maxlength="32" autocomplete="name" required>
+          </div>
+          <button class="text-btn" type="submit">Simpan</button>
+        </form>
+        <div class="settings-row">
+          <div>
+            <strong>Tema gelap</strong>
+            <div class="settings-description">Gunakan tampilan gelap pada aplikasi.</div>
+          </div>
+          <input id="theme-toggle" type="checkbox" aria-label="Aktifkan tema gelap">
+        </div>
+        <form id="opening-balance-form">
+          <label for="opening-balance" class="section-title">Saldo awal</label>
+          <div class="settings-description">Saldo awal digunakan sebagai dasar perhitungan saldo bersama transaksi.</div>
+          <input id="opening-balance" class="settings-input" type="number" min="0" step="100" required>
+          <div id="opening-balance-error" class="settings-description" role="status"></div>
+          <button class="primary-btn" type="submit">Simpan Saldo Awal</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const STORAGE_KEY = "financeAppDemo";
+    let state = { openingBalance: 0, balance: 0, transactions: [], theme: "light", displayName: "Andi" };
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && Array.isArray(saved.transactions)) {
+        const transactions = saved.transactions.filter(item =>
+          item &&
+          (item.type === "income" || item.type === "expense" || item.type === "transfer") &&
+          Number.isFinite(Number(item.amount)) &&
+          Number(item.amount) > 0
+        ).map(item => ({ ...item, amount: Number(item.amount) }));
+        const transactionNet = transactions.reduce(
+          (total, item) => total + (item.type === "income" ? item.amount : -item.amount),
+          0
+        );
+        const savedBalance = Number(saved.balance);
+        const openingBalance = Number.isFinite(Number(saved.openingBalance))
+          ? Number(saved.openingBalance)
+          : Math.max(0, (Number.isFinite(savedBalance) ? savedBalance : 0) - transactionNet);
+        state = {
+          openingBalance,
+          balance: openingBalance + transactionNet,
+          transactions,
+          theme: saved.theme === "dark" ? "dark" : "light",
+          displayName: typeof saved.displayName === "string" && saved.displayName.trim()
+            ? saved.displayName.trim().slice(0, 32)
+            : "Andi"
+        };
+      }
+    } catch (error) {
+      state = { openingBalance: 0, balance: 0, transactions: [], theme: "light", displayName: "Andi" };
+    }
+
+    const balanceEl = document.getElementById("balance");
+    const openingBalanceForm = document.getElementById("opening-balance-form");
+    const openingBalanceInput = document.getElementById("opening-balance");
+    const openingBalanceError = document.getElementById("opening-balance-error");
+    const themeToggle = document.getElementById("theme-toggle");
+    const profileNameEl = document.getElementById("profile-name");
+    const profileAvatarEl = document.getElementById("profile-avatar");
+    const profileForm = document.getElementById("profile-form");
+    const profileNameInput = document.getElementById("profile-name-input");
+    let balanceVisible = true;
+
+    document.body.classList.toggle("dark-theme", state.theme === "dark");
+    themeToggle.checked = state.theme === "dark";
+    openingBalanceInput.value = state.openingBalance;
+    profileNameInput.value = state.displayName;
+
+    function formatRupiah(amount) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function calculateBalance(openingBalance, transactions) {
+      return transactions.reduce(
+        (balance, item) => balance + (item.type === "income" ? item.amount : -item.amount),
+        openingBalance
+      );
+    }
+
+    function render() {
+      const firstInitial = Array.from(state.displayName.trim())[0].toLocaleUpperCase("id-ID");
+      profileNameEl.textContent = `Halo, ${state.displayName}`;
+      profileAvatarEl.textContent = firstInitial;
+      balanceEl.textContent = formatRupiah(state.balance);
+    }
+
+    profileAvatarEl.addEventListener("click", () => {
+      const menuPage = document.getElementById("menu-page");
+      const showMenu = !menuPage.classList.contains("active");
+      document.getElementById("home-page").classList.toggle("active", !showMenu);
+      menuPage.classList.toggle("active", showMenu);
+      profileAvatarEl.setAttribute("aria-expanded", String(showMenu));
+      profileAvatarEl.setAttribute(
+        "aria-label",
+        showMenu ? "Kembali ke beranda" : "Buka menu pengaturan"
+      );
+    });
+
+    document.querySelectorAll(".nav-btn[data-page]").forEach(button => {
+      button.addEventListener("click", () => {
+        const targetPage = button.dataset.page;
+        document.querySelectorAll(".page").forEach(page => {
+          page.classList.toggle("active", page.id === targetPage);
+        });
+        document.querySelectorAll(".nav-btn").forEach(navButton => {
+          navButton.classList.toggle("active", navButton === button);
+        });
+      });
+    });
+
+    themeToggle.addEventListener("change", () => {
+      state.theme = themeToggle.checked ? "dark" : "light";
+      document.body.classList.toggle("dark-theme", state.theme === "dark");
+      saveState();
+    });
+
+    profileForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const displayName = profileNameInput.value.trim();
+      if (!displayName) {
+        profileNameInput.focus();
+        return;
+      }
+
+      state.displayName = displayName.slice(0, 32);
+      profileNameInput.value = state.displayName;
+      saveState();
+      render();
+    });
+
+    openingBalanceForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const openingBalance = Number(openingBalanceInput.value);
+      if (!Number.isFinite(openingBalance) || openingBalance < 0) {
+        openingBalanceError.textContent = "Masukkan saldo awal yang valid.";
+        return;
+      }
+
+      const updatedBalance = calculateBalance(openingBalance, state.transactions);
+      if (updatedBalance < 0) {
+        openingBalanceError.textContent = "Saldo awal terlalu kecil untuk riwayat pengeluaran saat ini.";
+        return;
+      }
+
+      state.openingBalance = openingBalance;
+      state.balance = updatedBalance;
+      openingBalanceError.textContent = "";
+      saveState();
+      render();
+      openingBalanceForm.querySelector("button[type='submit']").textContent = "Tersimpan";
+      setTimeout(() => {
+        openingBalanceForm.querySelector("button[type='submit']").textContent = "Simpan Saldo Awal";
+      }, 1600);
+    });
+
+    render();
+  </script>
+</body>
+</html>
